@@ -246,14 +246,14 @@ table.mini th { color: var(--dim); text-transform: uppercase; letter-spacing: 0.
 .kicker { color: var(--accent); font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
 .shut { background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 6px; padding: 4px 9px; cursor: pointer; font: inherit; }
 .drawer-body { padding: 10px 14px; border-bottom: 1px solid var(--line); }
-.drawer-body h3 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--dim); }
+.drawer-body h3 { margin: 0 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--dim); }
 .equations { margin: 0; }
 .equations > div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px dashed var(--line); }
-.equations dt { color: var(--dim); flex-shrink: 0; font-size: 12px; }
-.equations dd { margin: 0; font-family: var(--mono); font-size: 12px; text-align: right; }
+.equations dt { color: var(--dim); flex-shrink: 0; font-size: 13px; }
+.equations dd { margin: 0; font-family: var(--mono); font-size: 13px; text-align: right; }
 .equations .total dd { font-size: 13px; color: var(--accent); }
 .plan { margin: 0; padding-left: 16px; }
-.plan li { margin: 0 0 5px; color: var(--text); font-size: 12px; line-height: 1.4; }
+.plan li { margin: 0 0 5px; color: var(--text); font-size: 13px; line-height: 1.4; }
 .plan li::marker { color: var(--accent); font-family: var(--mono); }
 .verdict { border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; background: var(--panel-2); margin-bottom: 8px; }
 .verdict .row { display: flex; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 10px; padding: 1px 0; }

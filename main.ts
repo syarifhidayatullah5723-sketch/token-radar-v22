@@ -49,7 +49,7 @@ const radar: RadarDoc = radarDoc(doc, board, scored);
 
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'board.json'), `${JSON.stringify({ rows: board })}\n`);
-writeFileSync(join(outDir, 'data.js'), dataPayload(radar));
+writeFileSync(join(outDir, 'zz-data.js'), dataPayload(radar));
 
 function mirrorTree(src: string, dst: string): number {
   if (!existsSync(src)) return 0;
