@@ -167,7 +167,6 @@ function masthead() {
     const s = doc.stats;
     const v = s.validation;
     const rh = rangeHolds();
-    const impliedSum = s.implied_sum_usd;
     const keepRows = doc.rows.filter((r) => r.verdict.verdict === 'keep');
     const farmNet = doc.rows.reduce((acc, r) => acc + (r.verdict.net_usd || 0), 0);
     const farmKeep = keepRows.length;
@@ -176,18 +175,12 @@ function masthead() {
     const rates = keepRows.map((r) => nph(r.verdict)).filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
     const medianRate = rates.length === 0 ? 0 : rates[Math.floor(rates.length / 2)];
     const items = [
-      { k: 'protocols scanned', v: String(s.protocols), sub: `${s.live} live token · ${s.excluded_cexs} CEX set aside` },
-      { k: 'watchlist covered', v: `${s.watch} / ${s.watch}`, sub: '100% · every name on the board', frac: s.watch / Math.max(s.watch, 1) },
-      { k: 'board rows', v: String(s.board), sub: `${s.below_floor} below floor · ${s.watch} on the watchlist` },
-      { k: 'implied value', v: money(impliedSum), sub: `median ${money(s.implied_median_usd)} · sum of the board` },
-      { k: 'out-of-sample miss', v: `${v.miss_median.toFixed(2)}×`, sub: `${v.n} priced tokens · holdout ${v.holdout_miss.toFixed(2)}×` },
-      { k: 'range holds', v: `${Math.round(rh.p50 * 100)}%`, sub: `${rh.n} priced · ${Math.round(rh.p90 * 100)}% in the P90 band · bias ${v.bias >= 0 ? '+' : ''}${v.bias.toFixed(2)}×` },
-      { k: 'held out by age', v: `${v.time.miss_b.toFixed(2)}×`, sub: `${v.time.train_a} older trained · ${v.time.train_b} newer held out` },
-      { k: 'walk-forward worst', v: `${v.walk.worst.toFixed(2)}×`, sub: `${v.walk.windows.length} windows · past trains, next tests` },
-      { k: 'terms kept', v: `${v.terms.filter((x) => x.kept).length}/${v.terms.length}`, sub: 'blind test, dropped where it does not earn its place' },
-      { k: 'integrity', v: `${s.integrity.filter((i) => i.ok).length}/${s.integrity.length}`, sub: `${s.coverage.length} buckets · ${s.protocols} protocols accounted` },
-      { k: 'farm net', v: money(farmNet), sub: `${farmKeep} keep · ${farmMarginal} marginal · ${farmPass} pass` },
-      { k: 'median $/h', v: `$${medianRate.toFixed(0)}`, sub: 'net ÷ hours over the keep set' }
+      { k: 'watchlist covered', v: `${s.watch} / ${s.watch}`, sub: 'every name on the board', frac: s.watch / Math.max(s.watch, 1) },
+      { k: 'board rows', v: String(s.board), sub: `${s.below_floor} below floor · ${s.watch} watchlist` },
+      { k: 'out-of-sample miss', v: `${v.miss_median.toFixed(2)}×`, sub: `${v.n} priced · holdout ${v.holdout_miss.toFixed(2)}× · bias ${v.bias >= 0 ? '+' : ''}${v.bias.toFixed(2)}×` },
+      { k: 'range honest', v: `${Math.round(rh.p50 * 100)}%`, sub: `${Math.round(rh.p90 * 100)}% in P90 · ${rh.n} priced` },
+      { k: 'terms kept', v: `${v.terms.filter((x) => x.kept).length}/${v.terms.length}`, sub: 'blind test · dropped where it does not earn its place' },
+      { k: 'farm net', v: money(farmNet), sub: `${farmKeep} keep · ${farmMarginal} marginal · ${farmPass} pass · median $${medianRate.toFixed(0)}/h` }
     ];
     return make('section', { class: 'kpis' }, items.map((it) => make('div', { class: 'kpi' }, [
       make('dt', { text: it.k }),
@@ -199,14 +192,13 @@ function masthead() {
   function funnel() {
     const s = doc.stats;
     return make('div', { class: 'funnel' }, [
-      make('span', { text: 'accounting' }),
-      make('span', { class: 'chip in', html: '' }, ['in: ', make('b', { text: String(s.protocols) }), ' snapshot']),
-      make('span', { class: 'chip in' }, ['in: ', make('b', { text: String(s.pre_token) }), ' pre-token']),
-      make('span', { class: 'chip out' }, ['out: ', make('b', { text: String(s.excluded_cexs) }), ' CEX']),
-      make('span', { class: 'chip in' }, ['in: ', make('b', { text: String(s.watch) }), ' watchlist']),
-      make('span', { class: 'chip in' }, ['in: ', make('b', { text: String(s.below_floor) }), ' below floor']),
-      make('span', { class: 'chip net' }, ['net: ', make('b', { text: String(s.board) }), ' ranked']),
-      make('span', { class: 'chip out' }, ['set aside: ', make('b', { text: String(s.live) }), ' live'])
+      make('span', { text: 'protocol accounting' }),
+      make('span', { class: 'chip in' }, [make('b', { text: String(s.protocols) }), ' scanned']),
+      make('span', { class: 'chip net' }, [make('b', { text: String(s.board) }), ' ranked pre-token']),
+      make('span', { class: 'chip in' }, [make('b', { text: String(s.watch) }), ' watchlist · ']),
+      make('span', { class: 'chip in' }, [make('b', { text: String(s.below_floor) }), ' below floor']),
+      make('span', { class: 'chip out' }, [make('b', { text: String(s.live) }), ' live token']),
+      make('span', { class: 'chip out' }, [make('b', { text: String(s.excluded_cexs) }), ' CEX set aside'])
     ]);
   }
 
@@ -416,7 +408,9 @@ function masthead() {
           make('div', { class: 'cell' }, [make('b', { text: `${v.miss_median.toFixed(2)}×` }), make('span', { text: 'value miss · leave-one-out' })]),
           make('div', { class: 'cell' }, [make('b', { text: `${v.holdout_miss.toFixed(2)}×` }), make('span', { text: 'value miss · held out' })]),
           make('div', { class: 'cell' }, [make('b', { text: `${v.walk.worst.toFixed(2)}×` }), make('span', { text: 'walk-forward worst' })]),
-          make('div', { class: 'cell' }, [make('b', { text: `${Math.round(rh.p50 * 100)}%` }), make('span', { text: `range honesty P50 · ${Math.round(rh.p90 * 100)}% P90` })])
+          make('div', { class: 'cell' }, [make('b', { text: `${Math.round(rh.p50 * 100)}%` }), make('span', { text: `range honesty P50 · ${Math.round(rh.p90 * 100)}% P90` })]),
+          make('div', { class: 'cell' }, [make('b', { text: `${v.terms.filter((x) => x.kept).length}/${v.terms.length}` }), make('span', { text: 'terms kept' })]),
+          make('div', { class: 'cell' }, [make('b', { text: `${farm} / ${doc.stats.board}` }), make('span', { text: 'farm keep' })])
         ]),
         make('h3', { text: `value model — term by term (${v.n} priced peers)` }),
         make('p', { class: 'method', text: 'A term is kept only where it lowers both the leave-one-out and the walk-forward miss. A term that only flatters the training set is dropped, not hidden.' }),
@@ -428,8 +422,8 @@ function masthead() {
               make('td', { class: 'num', text: `${t.miss.toFixed(2)}×` }),
               make('td', { class: `num ${t.kept ? 'ok' : 'bad'}`, text: `${t.delta >= 0 ? '+' : ''}${t.delta.toFixed(2)}×` }),
               make('td', { text: t.kept ? 'kept' : 'dropped', class: t.kept ? 'ok' : 'bad' })
-            ])
-          ))
+            ]))
+          )
         ]),
         make('h3', { text: 'token odds — logistic on the dated protocols' }),
         make('p', { class: 'method', text: 'A probability a token exists at all, kept apart from the implied value and multiplied only into the farm verdict.' }),
@@ -443,8 +437,10 @@ function masthead() {
           make('table', { class: 'rail-t' }, [
             make('thead', null, [make('tr', null, ['age band', 'n', 'model', 'actual'].map((h) => make('th', { text: h })))]),
             make('tbody', null, cal.map((c) => make('tr', null, [
-              make('td', { text: c.band }), make('td', { class: 'num', text: String(c.n) }),
-              make('td', { class: 'num', text: c.pred.toFixed(3) }), make('td', { class: 'num', text: c.actual.toFixed(3) })
+              make('td', { text: c.band }),
+              make('td', { class: 'num', text: String(c.n) }),
+              make('td', { class: 'num', text: c.pred.toFixed(3) }),
+              make('td', { class: 'num', text: c.actual.toFixed(3) })
             ])))
           ])
         ]) : null,
@@ -457,37 +453,7 @@ function masthead() {
   /* ---- basket builder: greedy by expected net per hour, fitted to capital
      and hours, so the reader sees the whole board turned into one plan. */
   function basket() {
-    const rows = doc.rows.slice().sort((a, b) => nph(b.verdict) - nph(a.verdict));
-    let budget = 25000, hrs = 5;
-    const picks = [];
-    for (const r of rows) {
-      if (r.verdict.verdict !== 'keep') continue;
-      const v = r.verdict;
-      if (v.net_usd <= 0) continue;
-      const plan = Math.max(250, Math.round(r.tvl_usd * 0.0002));
-      if (plan > budget) continue;
-      picks.push({ r, plan, net: v.net_usd, perHour: nph(v) });
-      budget -= plan;
-      if (budget < 250) break;
-    }
-    const totNet = picks.reduce((a, x) => a + x.net, 0);
-    const totPlan = picks.reduce((a, x) => a + x.plan, 0);
-    return make('section', { class: 'panel basket-panel' }, [
-      make('h2', { text: 'basket builder — best expected net per hour, fitted to your capital and week' }),
-      make('p', { class: 'method', text: `Walks the board in $/h order and takes each plan whose full size still fits the remaining capital. ${picks.length} plans · ${money(totPlan)} deployed · ${money(totNet)} expected net.` }),
-      make('div', { class: 'scroll' }, [
-        make('table', null, [
-          make('thead', null, [make('tr', null, ['protocol', 'plan', 'expected net', '$ / h', 'verdict'].map((h) => make('th', { text: h })))]),
-          make('tbody', null, picks.map((x) => make('tr', null, [
-            make('td', { text: x.r.name }),
-            make('td', { class: 'num', text: money(x.plan) }),
-            make('td', { class: 'num', text: money(x.net) }),
-            make('td', { class: 'num', text: `$${nph(x.r.verdict).toFixed(0)}` }),
-            make('td', null, [verdictPill(x.r.verdict)])
-          ])))
-        ])
-      ])
-    ]);
+    return null;
   }
 
   function openDrawer(slug) {
@@ -694,18 +660,14 @@ function masthead() {
     stage.appendChild(kpis());
     stage.appendChild(funnel());
     if (view.pane === 'pre') {
-      stage.appendChild(coverage());
       stage.appendChild(controls());
       const grid = make('section', { class: 'split' });
-      grid.appendChild(make('div', { class: 'col-main' }, [
-        view.pane === 'pre' ? preTable() : liveTable()
-      ]));
+      grid.appendChild(make('div', { class: 'col-main' }, [preTable()]));
       grid.appendChild(evidenceRail());
       stage.appendChild(grid);
-      stage.appendChild(basket());
       stage.appendChild(method());
     } else {
-      stage.appendChild(coverage());
+      stage.appendChild(evidenceRail());
       stage.appendChild(controls());
       stage.appendChild(liveTable());
     }

@@ -197,8 +197,45 @@ td.odds { font-family: var(--mono); font-size: 12px; }
 
 /* range + watch badge + dolarized net */
 td.rng { white-space: nowrap; }
-td.rng .range-note { display: block; font-size: 10px; color: var(--dim); }
-.watch-badge { display: inline-block; margin-top: 3px; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 6px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(56, 211, 159, 0.35); }
+
+/* v31 compact: single column, 1024px viewport, board rows 32px */
+@media (min-width: 1024px) {
+  .split { grid-template-columns: 1fr; }
+  .col-rail { position: static; }
+}
+@media (max-width: 1023px) {
+  .split { grid-template-columns: 1fr; }
+  .col-rail { position: static; }
+}
+
+/* compact board rows */
+tr.row { height: 32px; }
+tr.row td { padding: 2px 5px; }
+tr.row td.who b { font-size: 12px; }
+tr.row td.who small { font-size: 10px; line-height: 1.1; }
+tr.row td.num, tr.row td.val .num, tr.row td.rng .num { font-size: 12px; }
+tr.row td.rng small { font-size: 10px; }
+tr.row td.odds { font-size: 11px; }
+tr.row .pill { font-size: 9px; padding: 1px 5px; }
+tr.row .meter { height: 3px; margin-bottom: 2px; }
+
+/* compact rail */
+.rail-panel { padding: 10px; }
+.rail-panel h2 { margin: 0 0 3px; font-size: 11px; }
+.rail-panel h3 { margin: 8px 0 3px; font-size: 10px; }
+.rail-grid { gap: 4px; margin: 4px 0; }
+.rail-grid .cell { padding: 5px 7px; }
+.rail-grid .cell b { font-size: 13px; }
+.rail-grid .cell span { font-size: 9px; }
+table.rail-t { font-size: 10px; margin: 4px 0; }
+table.rail-t th, table.rail-t td { padding: 2px 5px; }
+.basket-panel { padding: 10px; margin-top: 10px; }
+.basket-panel h2 { margin: 0 0 3px; font-size: 12px; }
+.basket-panel .method { margin: 0 0 6px; }
+.basket-panel table { font-size: 11px; }
+.basket-panel th, .basket-panel td { padding: 4px 7px; }
+
+.val .meter { max-width: 92px; }
 td .up { color: var(--up); }
 td .down { color: var(--down); }
 
